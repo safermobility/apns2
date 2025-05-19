@@ -13,6 +13,9 @@ const SIGNING_ALGORITHM = "ES256"
 // Reset our signing token every 55 minutes as reccomended by Apple
 const RESET_TOKEN_INTERVAL_MS = 55 * 60 * 1000
 
+// Only keep our connections open for just over one hour, as a temporary workaround for not supporting PING frames
+const CLIENT_TTL_MS = 61 * 60 * 1000
+
 export enum Host {
   production = "api.push.apple.com",
   development = "api.sandbox.push.apple.com",
@@ -57,6 +60,7 @@ export class ApnsClient extends EventEmitter {
       pipelining: this.keepAlive ? 1 : 0,
       allowH2: true,
       maxConcurrentStreams: 100,
+      clientTtl: this.keepAlive ? CLIENT_TTL_MS : 1,
     })
     this._token = null
     this._supressH2Warning()
